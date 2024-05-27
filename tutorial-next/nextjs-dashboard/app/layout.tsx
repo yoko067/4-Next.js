@@ -7,7 +7,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="ja">
       <body className={`${inter.className} antialiased`/* フォントを滑らかにするクラス */}>{children}</body>
     </html>
   );
