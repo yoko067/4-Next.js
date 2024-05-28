@@ -11,8 +11,9 @@ export default function Search({ placeholder }: { placeholder: string }) {
   const handleSearch = useDebouncedCallback((term) => {   
     console.log(`Searching... ${term}`);
     const params = new URLSearchParams(searchParams); // URL作成
+    params.set('page', '1'); // 新しく検索を行ったときにpage1を表示する(リセットする) 
     if (term) {
-      params.set('query', term);
+      params.set('query', term); 
     } else {
       params.delete('query');
       replace(`${pathname}?${params.toString()}`); // 現在のURLに入力テキストをパラメータとして付与
