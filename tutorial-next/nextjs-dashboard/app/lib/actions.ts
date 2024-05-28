@@ -21,14 +21,18 @@ export async function createInvoice(formData: FormData) {
       amount: formData.get('amount'),
       status: formData.get('status'),
     });
-    const amountInCents = amount * 100; // 金額の単位をセントにする
-    const date = new Date().toISOString().split('T')[0]; // 日付データの形式を[YYYY-MM-DD]で作成
-
-    await sql`
-    INSERT INTO invoices (customer_id, amount, status, date)
-    VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
-  `;
-
+      const amountInCents = amount * 100; // 金額の単位をセントにする
+      const date = new Date().toISOString().split('T')[0]; // 日付データの形式を[YYYY-MM-DD]で作成
+    try {
+      await sql`
+        INSERT INTO invoices (customer_id, amount, status, date)
+        VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+      `;
+    } catch {
+      return {
+        message: 'Database Error: Failed to Create Invoice.',
+      };
+    }
   revalidatePath('/dashboard/invoices'); // キャッシュの削除
   redirect('/dashboard/invoices'); // 請求書一覧のページにリダイレクト
 
@@ -42,18 +46,29 @@ export async function updateInvoice(id: string, formData: FormData) {
   });
  
   const amountInCents = amount * 100;
- 
-  await sql`
-    UPDATE invoices
-    SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
-    WHERE id = ${id}
-  `;
- 
+  try {
+    await sql`
+      UPDATE invoices
+      SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+      WHERE id = ${id}
+    `;
+  } catch{
+    return {
+      message: 'Database Error: Failed to Update Invoice.',
+    };
+  }
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
 }
 
 export async function deleteInvoice(id: string) {
-  await sql`DELETE FROM invoices WHERE id = ${id}`;
-  revalidatePath('/dashboard/invoices');
+  try {
+    await sql`DELETE FROM invoices WHERE id = ${id}`;
+    revalidatePath('/dashboard/invoices');
+    return { message: 'Deleted Invoice.' };
+  } catch {
+    return {
+      message: 'Database Error: Failed to Delete Invoice.',
+    };
+  }
 }
