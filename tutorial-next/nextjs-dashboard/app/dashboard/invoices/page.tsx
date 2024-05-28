@@ -42,5 +42,5 @@ export default async function Page({
 
 // メタデータの作成
 export const metadata: Metadata = {
-  title: 'Invoices | Acme Dashboard',
+  title: 'Invoices',
 };
