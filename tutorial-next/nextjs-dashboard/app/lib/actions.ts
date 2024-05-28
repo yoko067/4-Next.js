@@ -4,6 +4,8 @@ import { z } from 'zod'; // 型検証に用いるライブラリ
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache'; // キャッシュをクリアし、サーバーへの新しい要求をする関数
 import { redirect } from 'next/navigation'; // リダイレクトを行う関数
+import { signIn } from '@/auth'; // サインイン機能の読み込み
+import { AuthError } from 'next-auth'; 
 
 const FormSchema = z.object({
   id: z.string(),
@@ -80,7 +82,7 @@ export async function updateInvoice(id: string, prevState: State, formData: Form
   }
   const { customerId, amount, status } = validatedFields.data;
   const amountInCents = amount * 100;
-  
+
   try {
     await sql`
       UPDATE invoices
@@ -105,5 +107,24 @@ export async function deleteInvoice(id: string) {
     return {
       message: 'Database Error: Failed to Delete Invoice.',
     };
+  }
+}
+
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid credentials.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
+    throw error;
   }
 }
