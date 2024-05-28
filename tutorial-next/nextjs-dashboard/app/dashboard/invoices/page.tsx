@@ -6,7 +6,7 @@ import { CreateInvoice } from '@/app/ui/invoices/buttons';
 import { lusitana } from '@/app/ui/fonts';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
- 
+import { Metadata } from 'next';
 
 export default async function Page({
   searchParams, // searchParams(URLパラメータを持つ)というpropsを受け取ることができる
@@ -39,3 +39,8 @@ export default async function Page({
     </div>
   );
 }
+
+// メタデータの作成
+export const metadata: Metadata = {
+  title: 'Invoices | Acme Dashboard',
+};
