@@ -1,5 +1,5 @@
 'use client';
-
+import { useDebouncedCallback } from 'use-debounce';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
   
@@ -8,7 +8,8 @@ export default function Search({ placeholder }: { placeholder: string }) {
   const pathname = usePathname(); // 現在のURLを取得する関数
   const { replace } = useRouter(); // URLを更新することができる関数
 
-  function handleSearch(term: string) {
+  const handleSearch = useDebouncedCallback((term) => {   
+    console.log(`Searching... ${term}`);
     const params = new URLSearchParams(searchParams); // URL作成
     if (term) {
       params.set('query', term);
@@ -16,7 +17,8 @@ export default function Search({ placeholder }: { placeholder: string }) {
       params.delete('query');
       replace(`${pathname}?${params.toString()}`); // 現在のURLに入力テキストをパラメータとして付与
     }
-}
+  }, 300); // 0.3秒間のデバウンスを行う
+
   return (
     <div className="relative flex flex-1 flex-shrink-0">
       <label htmlFor="search" className="sr-only">
